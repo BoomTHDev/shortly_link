@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: shortly_link_backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./backend:/app
+    env_file:
+      - ./backend/.env
+    networks:
+      - shortly_link_network
+    depends_on:
+      - db
+
+  frontend:
+    build: ./frontend
+    container_name: shortly_link_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    env_file:
+      - ./frontend/.env
+    networks:
+      - shortly_link_network
+    depends_on:
+      - backend
+
+  db:
+    image: postgres:17.5
+    container_name: shortly_link_db
+    env_file:
+      - ./.env
+    ports:
+      - "5432:5432"
+    volumes:
+      - shortly_link_data:/var/lib/postgresql/data
+    networks:
+      - shortly_link_network
+
+volumes:
+  shortly_link_data:
+
+networks:
+  shortly_link_network:
+    driver: bridge
